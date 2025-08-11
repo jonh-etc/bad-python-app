@@ -1,16 +1,23 @@
 import os
 import flask
+import subprocess
 
 app = flask.Flask(__name__)
 
 
 @app.route("/route_param/<route_param>")
 def route_param(route_param):
+    allowed_commands = {
+        "uptime": ["uptime"],
+        "ls": ["ls", "-l"],
+    }
 
-    # ruleid:dangerous-os-exec
-    os.execl("/bin/bash", "/bin/bash", "-c", route_param)
+    if route_param not in allowed_commands:
+        return "nice try!"
 
-    return "oops!"
+    subprocess.call(allowed_commands.get(route_param))
+
+    return "slightly better"
 
 
 # Flask true negatives
