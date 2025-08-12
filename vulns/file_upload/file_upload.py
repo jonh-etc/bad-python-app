@@ -2,6 +2,7 @@ import os
 from flask import render_template
 from pathlib import Path
 from util import get_uploads_folder_url
+import subprocess
 
 
 ALLOWED_EXTENSIONS = ['.png', '.jpeg', '.jpg']
@@ -28,7 +29,7 @@ def file_upload_api(request, app):
 
     public_upload_file_path = os.path.join(app.config['PUBLIC_UPLOAD_FOLDER'], file_name)
     
-    os.system(f'mv {saved_file_path} {public_upload_file_path}')
+    subprocess.call(["mv", saved_file_path, public_upload_file_path])
 
     return render_template('file_upload.html', file_url=f'{get_uploads_folder_url()}/{file_name}')
 
@@ -45,8 +46,7 @@ def _save_temp_file(file, app):
     
     resized_image_path = f'{temp_upload_file_path}.min.png'
     # https://imagemagick.org/script/convert.php
-    command = f'convert "{temp_upload_file_path}" -resize 50% "{resized_image_path}"'
-    os.system(command)
+    subprocess.call(["convert", temp_upload_file_path, "-resize", "50%", resized_image_path])
 
     return {
         'saved_path': resized_image_path
